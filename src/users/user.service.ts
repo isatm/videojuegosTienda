@@ -26,6 +26,7 @@ export class UsersService implements UserServiceInterface {
     return userObj as User;
   }
 
+  /* endpoint to create a user */
   async create(createUserDto: CreateUserDto): Promise<User> {
     //Check if user already exists
     const existingUser = await this.userModel.findOne({ email: createUserDto.email }).exec();
@@ -48,6 +49,7 @@ export class UsersService implements UserServiceInterface {
     return this.toUserInterface(savedUser);
   }
 
+  /* endpoint to login a user */
   async login(loginDto: LoginDto): Promise<User> {
     const user = await this.userModel.findOne({ email: loginDto.email }).exec();
     
@@ -80,6 +82,7 @@ export class UsersService implements UserServiceInterface {
     return this.toUserInterface(updatedUser);
   }
 
+  /* endpoint to verify an email for login */
   async verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<{user: User, accessToken: string; refreshToken: string }> {
     const { email, code } = verifyEmailDto;
     const user = await this.userModel.findOne({ email }).exec();
@@ -124,7 +127,7 @@ export class UsersService implements UserServiceInterface {
     };
   }
 
-  //Implementing the missing methods
+  /* endpoint to refresh token */
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       //Verify refresh token
@@ -166,12 +169,13 @@ export class UsersService implements UserServiceInterface {
     }
   }
 
-  //Update all other methods to use the toUserInterface helper
+  /* endpoint to find all users */
   async findAll(): Promise<User[]> {
     const users = await this.userModel.find().exec();
     return users.map(user => this.toUserInterface(user));
   }
 
+  /* endpoint to find one user by id */
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
@@ -180,6 +184,7 @@ export class UsersService implements UserServiceInterface {
     return this.toUserInterface(user);
   }
 
+  /* endpoint to find one user by email */
   async findByEmail(email: string): Promise<User> {
     const user = await this.userModel.findOne({ email }).exec();
     if (!user) {
@@ -188,6 +193,7 @@ export class UsersService implements UserServiceInterface {
     return this.toUserInterface(user);
   }
 
+  /* endpoint to update one user by id */
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
@@ -213,6 +219,8 @@ export class UsersService implements UserServiceInterface {
     return this.toUserInterface(updatedUser);
   }
 
+
+  /* endpoint to delete one user by id */
   async remove(id: string): Promise<void> {
     const result = await this.userModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0) {
@@ -220,6 +228,7 @@ export class UsersService implements UserServiceInterface {
     }
   }
 
+  /* endpoint to change password */
   async changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<void> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
@@ -238,6 +247,7 @@ export class UsersService implements UserServiceInterface {
     await user.save();
   }
 
+  /* endpoint to get tokens */
   private async getTokens(userId: string, email: string, role: string): Promise<{ accessToken: string; refreshToken: string }> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
