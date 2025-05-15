@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User as SchemaUser, UserDocument } from './schema/user.schema';
-import { ChangePasswordDto, CreateUserDto, LoginDto, RefreshTokenDto, UpdateUserDto, VerifyEmailDto } from './dto/user.dto';
+import { ChangePasswordDto, CreateUserDto, LoginDto, RefreshTokenDto, ResendVerificationCodeDto, UpdateUserDto, VerifyEmailDto } from './dto/user.dto';
 import { EmailService } from '../email/email.service';
 import { User, UserServiceInterface } from './interfaces/user.interface';
 
@@ -22,6 +22,7 @@ export class UsersService implements UserServiceInterface {
     const userObj = userDoc.toObject();
     userObj.id = userObj._id.toString();
     delete userObj.password;
+    delete userObj._id;
     delete userObj.__v;
     return userObj as User;
   }
@@ -37,24 +38,65 @@ export class UsersService implements UserServiceInterface {
     //Hash password
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
+    //Verification
+    //Create Code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); 
+    const verificationCodeExpires = new Date();
+    verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 2);
+
     //Create new user
     const newUser = new this.userModel({
       ...createUserDto,
-      password: hashedPassword
+      password: hashedPassword,
+      verificationCode: verificationCode,
+      verificationCodeExpires: verificationCodeExpires
     });
+
+    //Send email
+    await this.emailService.sendVerificationEmail(
+      newUser.email,
+      newUser.name,
+      verificationCode,
+    );
 
     const savedUser = await newUser.save();
 
-    //Return user without sensitive data
     return this.toUserInterface(savedUser);
   }
 
-  /* endpoint to login a user */
-  async login(loginDto: LoginDto): Promise<User> {
+  async resendVerificationCode(resendVerificationCodeDto: ResendVerificationCodeDto): Promise<User> {
+    const user = await this.userModel.findOne({ email: resendVerificationCodeDto.email }).exec()
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    //Recreate Code
+    user.verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); 
+    user.verificationCodeExpires = new Date();
+    user.verificationCodeExpires.setMinutes(user.verificationCodeExpires.getMinutes() + 2);
+
+    //Send email
+    await this.emailService.sendVerificationEmail(
+      user.email,
+      user.name,
+      user.verificationCode,
+    );
+
+    const savedUser = await user.save();
+
+    return this.toUserInterface(savedUser);
+  }
+
+  async login(loginDto: LoginDto): Promise<{user: User, token: string, refresh: string}> {
     const user = await this.userModel.findOne({ email: loginDto.email }).exec();
     
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isVerified){
+      throw new UnauthorizedException('Not verified email');
     }
 
     //Compare passwords
@@ -63,27 +105,26 @@ export class UsersService implements UserServiceInterface {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    //Create Code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); 
-    const verificationCodeExpires = new Date();
-    verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 2); 
-
-    user.verificationCode = verificationCode;
-    user.verificationCodeExpires = verificationCodeExpires;
+    //Generate tokens
+    //Access the _id as a property of the document
+    const tokens = await this.getTokens(user.id, user.email, user.role);
+    
+    //Update refresh token in database
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    user.refreshToken = hashedRefreshToken;
 
     const updatedUser = await user.save();
 
-    await this.emailService.sendVerificationEmail(
-      user.email,
-      user.name,
-      verificationCode,
-    );
+    const responseUser = this.toUserInterface(updatedUser);
 
-    return this.toUserInterface(updatedUser);
+    return {
+      user: responseUser,
+      token: tokens.accessToken,
+      refresh: tokens.refreshToken
+    }
   }
 
-  /* endpoint to verify an email for login */
-  async verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<{user: User, accessToken: string; refreshToken: string }> {
+  async verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<User> {
     const { email, code } = verifyEmailDto;
     const user = await this.userModel.findOne({ email }).exec();
     
@@ -102,29 +143,15 @@ export class UsersService implements UserServiceInterface {
     if (user.verificationCodeExpires && new Date() > user.verificationCodeExpires) {
         throw new BadRequestException('Verification code expired');
     }
-
+    
     //Update user verification status
     user.isVerified = true;
     user.verificationCode = undefined;
     user.verificationCodeExpires = undefined;
 
-    //Generate tokens
-    //Access the _id as a property of the document
-    const tokens = await this.getTokens(user.id, user.email, user.role);
-    
-    //Update refresh token in database
-    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
-    user.refreshToken = hashedRefreshToken;
-
     const updatedUser = await user.save();
 
-    const userResponse = this.toUserInterface(updatedUser);
-
-    return {
-        user: userResponse,
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken
-    };
+    return this.toUserInterface(updatedUser);
   }
 
   /* endpoint to refresh token */
