@@ -2,6 +2,7 @@ import {
     ChangePasswordDto,
     CreateUserDto,
     LoginDto,
+    ResendVerificationCodeDto,
     UpdateUserDto,
     VerifyEmailDto
   } from '../dto/user.dto';
@@ -24,8 +25,9 @@ import {
     create(createUserDto: CreateUserDto): Promise<User>;
     login(
       loginDto: LoginDto,
-    ): Promise<User>;
-    verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<{user: User, accessToken: string; refreshToken: string }>;
+    ): Promise<{user:User, token:string, refresh:string}>;
+    verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<User>;
+    resendVerificationCode(resendVerificationCodeDto: ResendVerificationCodeDto): Promise<User>;
     findAll(): Promise<User[]>;
     findOne(id: string): Promise<User>;
     findByEmail(email: string): Promise<User>;

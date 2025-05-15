@@ -17,7 +17,8 @@ import {
     LoginDto, 
     RefreshTokenDto, 
     ChangePasswordDto, 
-    VerifyEmailDto
+    VerifyEmailDto,
+    ResendVerificationCodeDto
   } from './dto/user.dto';
   import { JwtAuthGuard } from './guards/jwt-auth.guard';
   
@@ -28,18 +29,24 @@ import {
     @Post('signup')
     async create(@Body() createUserDto: CreateUserDto) {
       await this.usersService.create(createUserDto);
-      return { message: 'User registered successfully.' };
-    }
-  
-    @Post('login')
-    async login(@Body() loginDto: LoginDto) {
-      await this.usersService.login(loginDto);
-      return { message: ' Please check your email for verification code.' };
+      return { message: 'Please check your email for verification code.' };
     }
 
     @Post('verify-email')
-    verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-      return this.usersService.verifyEmail(verifyEmailDto);
+    async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+      return await this.usersService.verifyEmail(verifyEmailDto);
+    }
+
+    @Post('resend-code')
+    async resendCode(@Body() resendVerifcationCodeDto: ResendVerificationCodeDto) {
+      await this.usersService.resendVerificationCode(resendVerifcationCodeDto);
+      return { message: 'Please check your email for verification code.' };
+    }
+  
+    @HttpCode(HttpStatus.OK)
+    @Post('login')
+    async login(@Body() loginDto: LoginDto) {
+      return await this.usersService.login(loginDto);
     }
 
     @UseGuards(JwtAuthGuard)
