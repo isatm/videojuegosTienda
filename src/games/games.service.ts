@@ -30,7 +30,7 @@ export class GamesService implements GameServiceInterface {
         }
         
         //Date exception
-        if (createGameDto.release < new Date()) {
+        if (createGameDto.release && createGameDto.release < new Date()) {
             throw new BadRequestException('Invalid Date.');
         }
 

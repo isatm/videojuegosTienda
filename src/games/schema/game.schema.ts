@@ -4,6 +4,17 @@ import { Document } from 'mongoose';
 
 export type GameDocument = Game & Document;
 
+export enum GameGender {
+  Action = 'Accion',
+  Adventure = 'Aventura',
+  Sports = 'Deportes',
+  Strategy = 'Estrategia',
+  RPG = 'RPG',
+  Sandbox = 'Sandbox',
+  Terror = 'Terror',
+  Multiplayer = 'Multijugador'
+}
+
 @Schema({ timestamps: true })
 export class Game {
   @Prop({ required: true, unique: true })
@@ -12,8 +23,11 @@ export class Game {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  gender: string[];
+  @Prop({ 
+    required: true,
+    type: [String],
+    enum: Object.values(GameGender) }) 
+  gender: GameGender[];
 
   @Prop({ default: 0 })
   price: number;

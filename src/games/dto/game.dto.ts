@@ -6,7 +6,9 @@ import {
     IsDate,
     IsOptional,
     IsArray,
+    IsEnum,
   } from 'class-validator';
+import { GameGender } from '../schema/game.schema';
   
 export class CreateGameDto {
   @IsNotEmpty()
@@ -18,16 +20,16 @@ export class CreateGameDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsEnum(GameGender, { each: true })
   @IsArray()
-  gender: string[];
+  gender?: GameGender[];
   
   @IsOptional()
   @IsNumber()
-  price: number;
+  price?: number;
 
   @IsOptional()
   @IsDate()
-  release: Date;
+  release?: Date;
 }
   
