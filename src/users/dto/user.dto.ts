@@ -5,12 +5,14 @@ import {
     IsString,
     MinLength,
     IsOptional,
+    IsObject,
   } from 'class-validator';
+import mongoose from 'mongoose';
   
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  nickname: string;
 
   @IsNotEmpty()
   @IsEmail()
@@ -22,20 +24,31 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 }
+
+export class ResendVerificationCodeDto {
+  @IsNotEmpty()
+  @IsEmail()
+  @Transform(({ value }) => value.trim().toLowerCase())
+  email: string;
+}
   
 export class UpdateUserDto {
   @IsOptional()
   @IsString()
-  name?: string;
+  nickname?: string;
 
   @IsOptional()
   @IsEmail()
+  @Transform(({ value }) => value.trim().toLowerCase())
   email?: string;
 
   @IsOptional()
   @IsString()
   @MinLength(6)
   password?: string;
+
+  @IsOptional()
+  gamesPublished?: mongoose.Schema.Types.ObjectId[];
 }
 
 export class LoginDto {
@@ -77,9 +90,3 @@ export class VerifyEmailDto {
   code: string;
 }
 
-export class ResendVerificationCodeDto {
-  @IsNotEmpty()
-  @IsEmail()
-  @Transform(({ value }) => value.trim().toLowerCase())
-  email: string;
-}

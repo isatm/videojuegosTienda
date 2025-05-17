@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import {
     ChangePasswordDto,
     CreateUserDto,
@@ -10,10 +11,11 @@ import {
   export interface User {
     _id?: string;        
     id?: string;           
-    name: string;
+    nickname: string;
     email: string;
     isVerified: boolean;
     role: string;
+    gamesPublished?: mongoose.Schema.Types.ObjectId[];
     refreshToken?: string;
     verificationCode?: string;
     verificationCodeExpires?: Date;
