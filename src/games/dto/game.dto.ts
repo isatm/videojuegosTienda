@@ -7,6 +7,7 @@ import {
     IsOptional,
     IsArray,
     IsEnum,
+    IsDateString,
   } from 'class-validator';
 import { GameGender } from '../schema/game.schema';
   
@@ -29,7 +30,7 @@ export class CreateGameDto {
   price?: number;
 
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   release?: Date;
 }
 

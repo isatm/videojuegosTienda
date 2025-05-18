@@ -12,7 +12,8 @@ export enum GameGender {
   RPG = 'RPG',
   Sandbox = 'Sandbox',
   Terror = 'Terror',
-  Multiplayer = 'Multijugador'
+  Multiplayer = 'Multijugador',
+  Other = 'Otro'
 }
 
 @Schema({ timestamps: true })
@@ -32,7 +33,8 @@ export class Game {
   @Prop({ default: 0 })
   price: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ required: true, 
+  type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   creatorId: mongoose.Schema.Types.ObjectId;
 
   @Prop({ default: 0 })
