@@ -13,6 +13,7 @@ import { CryptoModule } from 'src/crypto/crypto.module';
     CryptoModule
   ],
   providers: [CardsService],
-  controllers: [CardsController]
+  controllers: [CardsController],
+  exports: [CardsService]
 })
 export class CardsModule {}

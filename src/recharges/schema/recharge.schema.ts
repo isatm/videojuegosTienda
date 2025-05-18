@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { Card } from 'src/cards/schema/card.schema';
-import { User } from 'src/users/schema/user.schema';
 
 export type RechargeDocument = Recharge & Document;
 

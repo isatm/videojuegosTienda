@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Card, CardDocument } from './schema/card.schema';
 import { UsersService } from 'src/users/user.service';
 import { RegisterCardDto } from './dto/card.dto';
-import { Model, Types } from 'mongoose';
+import { isValidObjectId, Model, Types } from 'mongoose';
 import { CryptoService } from 'src/crypto/crypto.service';
 
 @Injectable()
@@ -40,5 +40,18 @@ export class CardsService {
     const saved = await cardDoc.save();
 
     return this.toCardInterface(saved);
+  }
+
+  async findById(cardId: string): Promise<Card> {
+    if (!isValidObjectId(cardId)) {
+      throw new BadRequestException(`Invalid card ID: ${cardId}`);
+    }
+
+    const card = await this.cardModel.findById(cardId).exec();
+    if (!card) {
+      throw new NotFoundException(`Card with ID ${cardId} not found`);
+    }
+
+    return this.toCardInterface(card);
   }
 }

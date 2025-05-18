@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException, 
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User as SchemaUser, UserDocument } from './schema/user.schema';
 import { ChangePasswordDto, CreateUserDto, LoginDto, RefreshTokenDto, ResendVerificationCodeDto, UpdateUserDto, VerifyEmailDto } from './dto/user.dto';
@@ -202,6 +202,21 @@ export class UsersService implements UserServiceInterface {
     } catch (error) {
       throw new UnauthorizedException(error);
     }
+  }
+
+  async recharge(userId: string, delta: number): Promise<User> {
+    const result = await this.userModel
+      .findByIdAndUpdate(
+        new Types.ObjectId(userId),
+        { $inc: { balance: delta } },
+        { new: true, select: 'balance' }
+      ).exec();
+
+    if (!result) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return this.toUserInterface(result);
   }
 
   //---

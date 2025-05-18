@@ -15,6 +15,7 @@ import {
     email: string;
     isVerified: boolean;
     role: string;
+    balance: number;
     gamesPublished?: mongoose.Schema.Types.ObjectId[];
     refreshToken?: string;
     verificationCode?: string;
@@ -30,6 +31,7 @@ import {
     ): Promise<{user:User, token:string, refresh:string}>;
     verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<User>;
     resendVerificationCode(resendVerificationCodeDto: ResendVerificationCodeDto): Promise<User>;
+    recharge(userId: string, delta: number): Promise<User>;
     findAll(): Promise<User[]>;
     findOne(id: string): Promise<User>;
     findByEmail(email: string): Promise<User>;

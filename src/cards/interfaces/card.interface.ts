@@ -15,4 +15,5 @@ export interface Card {
 
 export interface CardServiceInterface {
     register(registerCardDto: RegisterCardDto, userId: string): Promise<Card>;
+    findByOne(CardId: string): Promise<Card>;
 }
