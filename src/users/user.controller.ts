@@ -48,8 +48,7 @@ import {
     async login(@Body() loginDto: LoginDto) {
       return await this.usersService.login(loginDto);
     }
-
-    @UseGuards(JwtAuthGuard)
+    
     @HttpCode(HttpStatus.OK)
     @Post('refresh-token')
     refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {

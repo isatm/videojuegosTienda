@@ -32,4 +32,28 @@ export class CreateGameDto {
   @IsDate()
   release?: Date;
 }
+
+export class UpdateGameDto {
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => value.trim().toLowerCase())
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsEnum(GameGender, { each: true })
+  @IsArray()
+  gender?: GameGender[];
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsDate()
+  release?: Date;
+}
   

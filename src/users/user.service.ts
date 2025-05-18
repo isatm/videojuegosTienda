@@ -163,8 +163,6 @@ export class UsersService implements UserServiceInterface {
     }
   }
 
-  //---
-
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       //Verify refresh token
@@ -206,6 +204,7 @@ export class UsersService implements UserServiceInterface {
     }
   }
 
+  //---
   async changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<void> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {

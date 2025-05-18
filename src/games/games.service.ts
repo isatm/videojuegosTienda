@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game as SchemaGame, GameDocument } from './schema/game.schema';
 import mongoose, { Model } from 'mongoose';
 import { Game, GameServiceInterface } from './interfaces/game.interface';
-import { CreateGameDto } from './dto/game.dto';
+import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
 import { UsersService } from 'src/users/user.service';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class GamesService implements GameServiceInterface {
         //Create game
         const newGame = new this.gameModel({
             ...createGameDto,
-            creatorId: (await user)._id
+            creatorId: creatorId
         });
 
         //Add game in "gamesPublished"
@@ -48,5 +48,39 @@ export class GamesService implements GameServiceInterface {
         });
 
         return this.toGameInterface(savedGame);
+    }
+
+    async update(updateGameDto: UpdateGameDto, gameId: string, userId: string): Promise<Game> {
+        if (!mongoose.Types.ObjectId.isValid(gameId)) {
+            throw new BadRequestException('Invalid game ID.');
+        }
+
+        //GameNotFoundException
+        const game = await this.gameModel.findById(gameId).exec();
+        if (!game) {
+            throw new NotFoundException(`Game with ID "${gameId}" not found.`);
+        }
+
+        //TheUserIsTheAuthorException
+        if (game.creatorId.toString() !== userId.toString()) {
+            throw new ForbiddenException('You are not the author of this game');
+        }
+
+        //DateException
+        if (updateGameDto.release && updateGameDto.release < new Date()) {
+            throw new BadRequestException('Invalid release date.');
+        }
+
+        const updatedGame = await this.gameModel.findByIdAndUpdate(gameId, updateGameDto, {
+            new: true,            
+            runValidators: true,  
+        });
+
+        //ValidationUpdate
+        if (!updatedGame) {
+            throw new NotFoundException(`Game with ID "${gameId}" not found after update.`);
+        }
+
+        return this.toGameInterface(updatedGame);
     }
 }
