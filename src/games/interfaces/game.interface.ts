@@ -18,4 +18,5 @@ export interface Game {
 
 export interface GameServiceInterface {
     create(createGameDto: CreateGameDto, creatorId: string): Promise<Game>;
+    findOne(id: string): Promise<Game>;
 }

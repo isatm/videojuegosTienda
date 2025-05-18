@@ -26,7 +26,7 @@ import {
   export class UsersController {
     constructor(private readonly usersService: UsersService) {}
   
-    @Post('')
+    @Post('signup')
     async create(@Body() createUserDto: CreateUserDto) {
       await this.usersService.create(createUserDto);
       return { message: 'Please check your email for verification code.' };

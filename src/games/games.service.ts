@@ -49,4 +49,15 @@ export class GamesService implements GameServiceInterface {
 
         return this.toGameInterface(savedGame);
     }
+
+    async findOne(id: string): Promise<Game> {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new BadRequestException('ID invalid');
+    }
+    const game = await this.gameModel.findById(id).exec();
+    if (!game) {
+      throw new NotFoundException(`Game with ID "${id}" not found`);
+    }
+    return this.toGameInterface(game);
+    }
 }
