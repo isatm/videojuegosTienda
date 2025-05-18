@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game as SchemaGame, GameDocument } from './schema/game.schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { isValidObjectId, Model, Types } from 'mongoose';
 import { Game, GameServiceInterface } from './interfaces/game.interface';
 import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
 import { UsersService } from 'src/users/user.service';
@@ -82,5 +82,32 @@ export class GamesService implements GameServiceInterface {
         }
 
         return this.toGameInterface(updatedGame);
+    }
+
+    async incrementDownloadsAndEarnings(gameId: string, amount: number): Promise<void> {
+
+        if (!isValidObjectId(gameId)) {
+            throw new BadRequestException(`Invalid game ID: ${gameId}`);
+        }
+
+        const result = await this.gameModel.findByIdAndUpdate(
+        new Types.ObjectId(gameId),
+        { $inc: { downloads: 1, earnings: amount } },
+        { new: true },
+        ).exec();
+        if (!result) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+    }
+
+    async findById(gameId: string): Promise<Game> {
+        if (!isValidObjectId(gameId)) {
+        throw new BadRequestException(`Invalid game ID: ${gameId}`);
+        }
+        const game = await this.gameModel.findById(gameId).exec();
+        if (!game) {
+        throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+        return this.toGameInterface(game);
     }
 }

@@ -7,6 +7,8 @@ import { RechargesModule } from './recharges/recharges.module';
 import { CardsModule } from './cards/cards.module';
 import { CryptoService } from './crypto/crypto.service';
 import { CryptoModule } from './crypto/crypto.module';
+import { OrdersModule } from './orders/orders.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { CryptoModule } from './crypto/crypto.module';
     RechargesModule,
     CardsModule,
     CryptoModule,
+    OrdersModule,
+    ReviewsModule,
   ],
   providers: [CryptoService],
 })

@@ -4,7 +4,7 @@ import {
   } from '../dto/card.dto';
   
 export interface Card {
-    _id?: string;        
+    _id: mongoose.Schema.Types.ObjectId;        
     id?: string;           
     type: string;
     number: string;

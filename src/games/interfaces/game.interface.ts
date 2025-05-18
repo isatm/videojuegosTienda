@@ -5,7 +5,7 @@ import {
   } from '../dto/game.dto';
   
 export interface Game {
-    _id?: string;        
+    _id: mongoose.Schema.Types.ObjectId;        
     id?: string;           
     title: string;
     description: string;
@@ -20,4 +20,6 @@ export interface Game {
 export interface GameServiceInterface {
     create(createGameDto: CreateGameDto, creatorId: string): Promise<Game>;
     update(updateGameDto: UpdateGameDto, gameId: string, userId: string): Promise<Game>;
+    incrementDownloadsAndEarnings(gameId: string, amount: number): Promise<void>;
+    findById(gameId: string): Promise<Game>;
 }

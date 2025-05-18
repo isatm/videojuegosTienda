@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException, 
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { isValidObjectId, Model, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User as SchemaUser, UserDocument } from './schema/user.schema';
 import { ChangePasswordDto, CreateUserDto, LoginDto, RefreshTokenDto, ResendVerificationCodeDto, UpdateUserDto, VerifyEmailDto } from './dto/user.dto';
@@ -217,6 +217,20 @@ export class UsersService implements UserServiceInterface {
     }
 
     return this.toUserInterface(result);
+  }
+
+  async addPurchasedGame(userId: string, gameId: string): Promise<void> {
+    if (!isValidObjectId(userId) || !isValidObjectId(gameId)) {
+      throw new BadRequestException(`Invalid ID(s): user ${userId}, game ${gameId}`);
+    }
+    const result = await this.userModel.findByIdAndUpdate(
+      new Types.ObjectId(userId),
+      { $addToSet: { gamesPurchased: new Types.ObjectId(gameId) } },
+      { new: true },
+    ).exec();
+    if (!result) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
   }
 
   //---

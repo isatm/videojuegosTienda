@@ -9,13 +9,14 @@ import {
   } from '../dto/user.dto';
   
   export interface User {
-    _id?: string;        
+    _id: mongoose.Schema.Types.ObjectId;     
     id?: string;           
     nickname: string;
     email: string;
     isVerified: boolean;
     role: string;
     balance: number;
+    gamesPurchased?: mongoose.Schema.Types.ObjectId[];
     gamesPublished?: mongoose.Schema.Types.ObjectId[];
     refreshToken?: string;
     verificationCode?: string;
@@ -32,6 +33,7 @@ import {
     verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<User>;
     resendVerificationCode(resendVerificationCodeDto: ResendVerificationCodeDto): Promise<User>;
     recharge(userId: string, delta: number): Promise<User>;
+    addPurchasedGame(userId: string, gameId: string): Promise<void>;
     findAll(): Promise<User[]>;
     findOne(id: string): Promise<User>;
     findByEmail(email: string): Promise<User>;

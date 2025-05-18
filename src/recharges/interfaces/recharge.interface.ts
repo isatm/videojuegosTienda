@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { CreateRechargeDto } from '../dto/recharge.dto';
   
 export interface Recharge {
-    _id?: string;        
+    _id: mongoose.Schema.Types.ObjectId;    
     id?: string;           
     userId: mongoose.Schema.Types.ObjectId;
     cardId: mongoose.Schema.Types.ObjectId;

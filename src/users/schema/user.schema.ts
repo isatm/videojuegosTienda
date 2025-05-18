@@ -22,6 +22,9 @@ export class User {
   role: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }] })
+  gamesPurchased: mongoose.Schema.Types.ObjectId[];
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }] })
   gamesPublished: mongoose.Schema.Types.ObjectId[];
 
   @Prop({ type: String, required: false })
