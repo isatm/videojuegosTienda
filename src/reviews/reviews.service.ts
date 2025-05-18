@@ -42,8 +42,8 @@ export class ReviewsService implements ReviewServiceInterface{
 */
         const newReview = new this.reviewModel({
             ...createReviewDTO,
-            authorId: user._id,
-            gameId: game._id
+            authorId: user.id,
+            gameId: game.id
         })
 
         const savedReview = await newReview.save();

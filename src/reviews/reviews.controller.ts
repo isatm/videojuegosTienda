@@ -10,8 +10,9 @@ export class ReviewsController {
     @Post("score/:id")
     async create(
         @Body() createReviewDTO: CreateReviewDTO,
-        @Param('id') gameId: string,
+        @Param() params: { id: string },
         @Request() req){
+            const gameId = params.id;
             const userId= req.user.id;
             return await this.reviewsService.create(createReviewDTO, userId, gameId);
         }
