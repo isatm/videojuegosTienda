@@ -6,6 +6,7 @@ import {
     Patch, 
     Param, 
     Delete, 
+    Request,
     UseGuards, 
     HttpCode, 
     HttpStatus 
@@ -26,7 +27,7 @@ import {
   export class UsersController {
     constructor(private readonly usersService: UsersService) {}
   
-    @Post('signup')
+    @Post('')
     async create(@Body() createUserDto: CreateUserDto) {
       await this.usersService.create(createUserDto);
       return { message: 'Please check your email for verification code.' };
@@ -48,8 +49,7 @@ import {
     async login(@Body() loginDto: LoginDto) {
       return await this.usersService.login(loginDto);
     }
-
-    @UseGuards(JwtAuthGuard)
+    
     @HttpCode(HttpStatus.OK)
     @Post('refresh-token')
     refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
@@ -79,12 +79,13 @@ import {
     }
   
     @UseGuards(JwtAuthGuard)
-    @Post(':id/change-password')
+    @Post('change-password')
     changePassword(
-      @Param('id') id: string,
+      @Request() req,
       @Body() changePasswordDto: ChangePasswordDto,
     ) {
-      return this.usersService.changePassword(id, changePasswordDto);
+      const userId = req.user.id;
+      return this.usersService.changePassword(userId, changePasswordDto);
     }
-  }
+}
   

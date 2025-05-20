@@ -137,7 +137,7 @@ export class EmailService {
           
           <div class="verification-code">${code}</div>
           
-          <p>Este código expirará en <strong>5 minutos</strong>.</p>
+          <p>Este código expirará en <strong>2 minutos</strong>.</p>
           
           <a href="${this.appUrl}/verify" class="btn">Verificar mi cuenta</a>
           
