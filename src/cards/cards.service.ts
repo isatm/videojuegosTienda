@@ -30,7 +30,7 @@ export class CardsService {
 
     const encryptedNumber = this.cryptoService.encrypt(registerCardDto.number);
     const encryptedCcv    = this.cryptoService.encrypt(registerCardDto.ccv);
-
+    
     const cardDoc = new this.cardModel({
       ...registerCardDto,
       number: encryptedNumber,

@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Recharge, RechargeServiceInterface } from './interfaces/recharge.interface';
 import { Model, Types } from 'mongoose';
 import { Recharge as SchemaRecharge, RechargeDocument } from './schema/recharge.schema';
@@ -27,6 +27,11 @@ export class RechargesService implements RechargeServiceInterface {
     async create(createRechargeDto: CreateRechargeDto, userId: string, cardId: string): Promise<Recharge> {
         const user = await this.usersService.findOne(userId);
         if (!user) throw new NotFoundException('User not founded');
+        
+        const purchasedCoins = createRechargeDto.purchasedCoins
+        if(purchasedCoins < 0){
+            throw new BadRequestException("You can't recharge negative coins");
+        }
 
         const card = await this.cardsService.findById(cardId); 
         if (!card) throw new NotFoundException('Card not founded');
@@ -34,6 +39,7 @@ export class RechargesService implements RechargeServiceInterface {
         if (card.userId.toString() !== userId) {
             throw new ForbiddenException('This card does not belong to this user');
         }
+
 
         const rechargeDoc = new this.rechargeModel({
         userId: new Types.ObjectId(userId),
