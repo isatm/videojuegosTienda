@@ -34,12 +34,6 @@ export class ReviewsService implements ReviewServiceInterface{
               throw new NotFoundException('Game not founded');
         }
 
-        //Date exception
-        /*
-        if (createReviewDTO.review_date < new Date()) {
-                    throw new BadRequestException('Invalid Date.');
-        }
-*/
         const newReview = new this.reviewModel({
             ...createReviewDTO,
             authorId: user.id,

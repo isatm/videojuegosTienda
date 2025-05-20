@@ -8,7 +8,7 @@ export type reviewDocument = Review & Document
 @Schema({ timestamps: true })
 export class Review {
 
-    @Prop({ required: true })
+    @Prop({ required: true, min: 0, max: 5 })
     score: number;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Game', required: true })
@@ -16,10 +16,7 @@ export class Review {
 
     @Prop({ required: true })
     comment: string;
-/*
-    @Prop({ type: Date })
-    review_date: Date
-*/
+
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
     authorId: mongoose.Schema.Types.ObjectId;
 

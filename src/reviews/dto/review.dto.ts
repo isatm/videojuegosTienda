@@ -1,20 +1,17 @@
 import { Type } from "class-transformer";
-import { IsDate, IsISO8601, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDate, IsISO8601, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max} from "class-validator";
 
 
 export  class CreateReviewDTO {
     @IsNotEmpty()
     @IsNumber()
+    @Min(0)
+    @Max(5)
     score: number;
 
     @IsNotEmpty()
     @IsString()
     comment: string;
-/*
-    @IsOptional()
-    @IsDate()
-    review_date: Date;
-*/ 
 }
 
 export  class UpdateReviewDTO {
