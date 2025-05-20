@@ -46,5 +46,5 @@ import {
       id: string,
       changePasswordDto: ChangePasswordDto,
     ): Promise<void>;
-  }
+}
   

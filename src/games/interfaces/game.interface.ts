@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import {
+    ClaimDto,
     CreateGameDto,
     UpdateGameDto,
   } from '../dto/game.dto';
@@ -22,4 +23,5 @@ export interface GameServiceInterface {
     update(updateGameDto: UpdateGameDto, gameId: string, userId: string): Promise<Game>;
     incrementDownloadsAndEarnings(gameId: string, amount: number): Promise<void>;
     findById(gameId: string): Promise<Game>;
+    claim(userId: string, claimDto: ClaimDto): Promise<void>;
 }

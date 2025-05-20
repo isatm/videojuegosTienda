@@ -1,9 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game as SchemaGame, GameDocument } from './schema/game.schema';
 import mongoose, { isValidObjectId, Model, Types } from 'mongoose';
 import { Game, GameServiceInterface } from './interfaces/game.interface';
-import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
+import { ClaimDto, CreateGameDto, UpdateGameDto } from './dto/game.dto';
 import { UsersService } from 'src/users/user.service';
 
 @Injectable()
@@ -109,5 +109,35 @@ export class GamesService implements GameServiceInterface {
         throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
         return this.toGameInterface(game);
+    }
+
+    async claim(userId: string, claimDto: ClaimDto): Promise<void> {
+        const { gameId } = claimDto;
+    
+        if (!isValidObjectId(userId) || !isValidObjectId(gameId)) {
+          throw new BadRequestException(`Invalid ID(s): user ${userId}, game ${gameId}`);
+        }
+    
+        const game = await this.gameModel.findById(gameId).exec();
+        if (!game) {
+          throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+    
+        // No creator validation
+        if (game.creatorId.toString() !== userId) {
+          throw new UnauthorizedException('Only the creator can reclaim');
+        }
+    
+        const amount = game.earnings;
+        if (!amount || amount <= 0) {
+          throw new BadRequestException('No earnings');
+        }
+    
+        // Reset earnings
+        game.earnings = 0;
+        await game.save();
+    
+        // 6) Recharge 
+        const updatedUser = await this.usersService.recharge(userId, amount);
     }
 }

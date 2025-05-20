@@ -6,6 +6,7 @@ import {
     MinLength,
     IsOptional,
     IsObject,
+    IsMongoId,
   } from 'class-validator';
 import mongoose from 'mongoose';
   

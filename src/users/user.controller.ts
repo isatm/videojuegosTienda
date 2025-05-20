@@ -6,6 +6,7 @@ import {
     Patch, 
     Param, 
     Delete, 
+    Request,
     UseGuards, 
     HttpCode, 
     HttpStatus 
@@ -78,12 +79,13 @@ import {
     }
   
     @UseGuards(JwtAuthGuard)
-    @Post(':id/change-password')
+    @Post('change-password')
     changePassword(
-      @Param('id') id: string,
+      @Request() req,
       @Body() changePasswordDto: ChangePasswordDto,
     ) {
-      return this.usersService.changePassword(id, changePasswordDto);
+      const userId = req.user.id;
+      return this.usersService.changePassword(userId, changePasswordDto);
     }
-  }
+}
   

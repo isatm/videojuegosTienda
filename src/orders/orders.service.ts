@@ -36,6 +36,10 @@ export class OrdersService implements OrderServiceInterface{
     const game = await this.gamesService.findById(createOrderDto.gameId);
     if (!game) throw new NotFoundException('Game not found');
 
+    if (game.creatorId.toString() === userId) {
+      throw new BadRequestException('The creator cant buy it');
+    }
+
     if (user.gamesPurchased?.includes(game._id)) {
       throw new BadRequestException('Game already purchased');
     }

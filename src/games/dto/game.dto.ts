@@ -8,6 +8,7 @@ import {
     IsArray,
     IsEnum,
     IsDateString,
+    IsMongoId,
   } from 'class-validator';
 import { GameGender } from '../schema/game.schema';
   
@@ -56,5 +57,11 @@ export class UpdateGameDto {
   @IsOptional()
   @IsDate()
   release?: Date;
+}
+
+export class ClaimDto{
+  @IsNotEmpty()
+  @IsMongoId()
+  gameId: string;
 }
   
