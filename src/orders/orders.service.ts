@@ -40,7 +40,11 @@ export class OrdersService implements OrderServiceInterface{
       throw new BadRequestException('The creator cant buy it');
     }
 
-    if (user.gamesPurchased?.includes(game._id)) {
+    const alreadyPurchased = user.gamesPurchased
+      .map(id => id.toString())
+      .some(idStr => idStr === createOrderDto.gameId);
+
+    if (alreadyPurchased) {
       throw new BadRequestException('Game already purchased');
     }
 
@@ -51,6 +55,8 @@ export class OrdersService implements OrderServiceInterface{
     await this.usersService.recharge(userId, -game.price);
 
     await this.gamesService.incrementDownloadsAndEarnings(createOrderDto.gameId, game.price);
+
+    await this.gamesService.claim(game.creatorId.toString(), createOrderDto.gameId);
 
     const order = await this.orderModel.create({
       userId: new Types.ObjectId(userId),

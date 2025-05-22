@@ -16,8 +16,8 @@ import {
     isVerified: boolean;
     role: string;
     balance: number;
-    gamesPurchased?: mongoose.Schema.Types.ObjectId[];
-    gamesPublished?: mongoose.Schema.Types.ObjectId[];
+    gamesPurchased: mongoose.Schema.Types.ObjectId[];
+    gamesPublished: mongoose.Schema.Types.ObjectId[];
     refreshToken?: string;
     verificationCode?: string;
     verificationCodeExpires?: Date;

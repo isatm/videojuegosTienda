@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Game as SchemaGame, GameDocument } from './schema/game.schema';
 import mongoose, { isValidObjectId, Model, Types } from 'mongoose';
 import { Game, GameServiceInterface } from './interfaces/game.interface';
-import { ClaimDto, CreateGameDto, UpdateGameDto } from './dto/game.dto';
+import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
 import { UsersService } from 'src/users/user.service';
 
 @Injectable()
@@ -111,8 +111,7 @@ export class GamesService implements GameServiceInterface {
         return this.toGameInterface(game);
     }
 
-    async claim(userId: string, claimDto: ClaimDto): Promise<void> {
-        const { gameId } = claimDto;
+    async claim(userId: string, gameId: string): Promise<void> {
     
         if (!isValidObjectId(userId) || !isValidObjectId(gameId)) {
           throw new BadRequestException(`Invalid ID(s): user ${userId}, game ${gameId}`);
@@ -123,21 +122,12 @@ export class GamesService implements GameServiceInterface {
           throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
     
-        // No creator validation
+        //No creator validation
         if (game.creatorId.toString() !== userId) {
           throw new UnauthorizedException('Only the creator can reclaim');
         }
     
-        const amount = game.earnings;
-        if (!amount || amount <= 0) {
-          throw new BadRequestException('No earnings');
-        }
-    
-        // Reset earnings
-        game.earnings = 0;
-        await game.save();
-    
-        // 6) Recharge 
-        const updatedUser = await this.usersService.recharge(userId, amount);
+        //Recharge
+        await this.usersService.recharge(userId, game.price);
     }
 }

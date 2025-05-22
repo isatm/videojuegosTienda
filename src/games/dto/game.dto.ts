@@ -58,10 +58,3 @@ export class UpdateGameDto {
   @IsDate()
   release?: Date;
 }
-
-export class ClaimDto{
-  @IsNotEmpty()
-  @IsMongoId()
-  gameId: string;
-}
-  

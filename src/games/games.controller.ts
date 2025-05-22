@@ -1,6 +1,6 @@
 import { Body, Controller, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { GamesService } from './games.service';
-import { ClaimDto, CreateGameDto, UpdateGameDto } from './dto/game.dto';
+import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
 @Controller('games')
@@ -20,12 +20,5 @@ export class GamesController {
     async update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto, @Request() req) {
         const userId = req.user.id;
         return this.gamesService.update(updateGameDto, id, userId);
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Post('claim')
-    claim(@Body() claimDto: ClaimDto, @Request() req){
-      const userId = req.user.id;
-      return this.gamesService.claim(userId, claimDto);
     }
 }

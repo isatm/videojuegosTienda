@@ -21,10 +21,10 @@ export class User {
   @Prop({ default: 'user' })
   role: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }], default: [] })
   gamesPurchased: mongoose.Schema.Types.ObjectId[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }], default: [] })
   gamesPublished: mongoose.Schema.Types.ObjectId[];
 
   @Prop({ type: String, required: false })
